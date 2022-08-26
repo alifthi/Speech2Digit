@@ -23,6 +23,9 @@ class Model():
     def compile(self,loss='binary_crossentropy',opt = "adam",met = ["accuracy"]):
         self.net.compile(loss = loss, optimizer=opt, metrics=met)
         self.net.summary()
+    def trainModel(self,Data,labels,epochs = 10,batchSize=32):
+        self.net.fit(Data,labels,epochs = epochs,batch_size = batchSize)
+        pass
     @staticmethod
     def BuildAudEncoder(inputShape):
         Input = tf.keras.Input(shape=inputShape)
