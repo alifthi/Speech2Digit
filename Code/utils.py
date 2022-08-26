@@ -1,7 +1,5 @@
 import glob
 import os
-
-from Code.main import AudioLabels
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras as ks
@@ -64,7 +62,8 @@ class utils():
         return spectrogram
     @staticmethod
     def audImagePair(Spectogram,images,audLabel,imLabel):
-        numElPerDigit = [audLabel.count(i) for i in range(10)]
+        tmp = list(audLabel)
+        numElPerDigit = [tmp.count(i) for i in range(10)]
         newImLabel = np.array(list(enumerate(imLabel)))
         index = [np.random.choice(np.where(newImLabel==i)[0],n) for i,n in enumerate(numElPerDigit)]
         pairs  = []
@@ -73,3 +72,4 @@ class utils():
             for idx in arr:
                 pairs.append([images[idx],Spectogram[t]])
                 t +=1
+        return [np.array(pairs),audLabel]
