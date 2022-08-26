@@ -26,7 +26,7 @@ class utils():
             Labels.append(int(file.split("/")[-1].split("_")[0]))
             if i%400 == 0:
                 print(f'{i}th file is readed')
-        return Audio,Labels
+        return np.array(Audio),np.array(Labels)
     @staticmethod
     def Audio2Spectrogram(Audio):
         Spectrogram = []
@@ -63,9 +63,13 @@ class utils():
         spectrogram = spectrogram[..., tf.newaxis]
         return spectrogram
     @staticmethod
-    def audImagePair(Spectogram,trainIm,audLabel,imLabel):
+    def audImagePair(Spectogram,images,audLabel,imLabel):
+        numElPerDigit = [audLabel.count(i) for i in range(10)]
+        newImLabel = np.array(list(enumerate(imLabel)))
+        index = [np.random.choice(np.where(newImLabel==i)[0],n) for i,n in enumerate(numElPerDigit)]
         pairs  = []
-        for i in audLabel:
-            pass
-
-        pass
+        t=0
+        for arr in index:
+            for idx in arr:
+                pairs.append([images[idx],Spectogram[t]])
+                t +=1
