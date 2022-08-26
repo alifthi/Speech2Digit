@@ -10,9 +10,14 @@ class Model():
         self.net =  self.buildModel()
     def buildModel(self):
         inp1 = ksl.Input([28,28,1],name = 'imageInput')
-        inp2 = ksl.Input([28,28,1],name = 'audInput')
-        outIm = self.Encoder(inp1)
-        outAud = self.audioEncoder(inp2)
+        inp2 = ksl.Input(( 124, 129, 1),name = 'audInput')
+        x1 = ksl.Flatten()(inp1)
+        x2 = ksl.Flatten()(inp2)
+        sharedDense = ksl.Dense(1024,activation = 'relu')
+        x1 = sharedDense(x1)
+        x2 = sharedDense(x2)
+        outIm = self.Encoder(x1)
+        outAud = self.audioEncoder(x2)
 
         lastLayer = ksl.Lambda(self.euclidean_distance)([outAud,outIm])
         denseLayer = ksl.Dense(1, activation="sigmoid")(lastLayer)
@@ -28,7 +33,7 @@ class Model():
         x = ksl.BatchNormalization()(x)
         x = ksl.Conv2D(32, kernel_size=3, strides=3, padding='same')(x)
         x = ksl.BatchNormalization()(x)
-        x = ksl.Dense(1024,activation='relu')(x)
+        x = ksl.Dense(64,activation='relu')(x)
         return tf.keras.models.Model(Input,x)
     @staticmethod
     def ReadModel(path):
@@ -40,7 +45,7 @@ class Model():
         for j in Decoder.layers:
             j.trainable = False
         return [Encoder,Decoder]
-    @tf.function
+#     @tf.function
     def euclidean_distance(vects):
         x, y = vects
         sum_square = K.sum(K.square(x - y), axis=1, keepdims=True)
