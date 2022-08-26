@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow.keras import layers as ksl
-from keras import backend as K
 import numpy as np
 
 class Model():
@@ -11,15 +10,13 @@ class Model():
     def buildModel(self):
         inp1 = ksl.Input([28,28,1],name = 'imageInput')
         inp2 = ksl.Input(( 124, 129, 1),name = 'audInput')
+        x1 = self.Encoder(inp1)
+        x1 = self.audioEncoder(inp2)
         x1 = ksl.Flatten()(inp1)
         x2 = ksl.Flatten()(inp2)
-        sharedDense = ksl.Dense(1024,activation = 'relu')
-        x1 = sharedDense(x1)
-        x2 = sharedDense(x2)
-        outIm = self.Encoder(x1)
-        outAud = self.audioEncoder(x2)
-
-        lastLayer = ksl.Lambda(self.euclidean_distance)([outAud,outIm])
+        outIm = ksl.Dense(1024,activation = 'relu')(x1)
+        outAud = ksl.Dense(1024,activation = 'relu')(x2)
+        lastLayer = ksl.Lambda(self.euclidean_distance)([outIm,outAud])
         denseLayer = ksl.Dense(1, activation="sigmoid")(lastLayer)
         net = tf.keras.models.Model([inp1,inp2],denseLayer)
         return net        
@@ -45,8 +42,8 @@ class Model():
         for j in Decoder.layers:
             j.trainable = False
         return [Encoder,Decoder]
-#     @tf.function
+    @staticmethod
+    @tf.function
     def euclidean_distance(vects):
-        x, y = vects
-        sum_square = K.sum(K.square(x - y), axis=1, keepdims=True)
-        return K.sqrt(K.maximum(sum_square, K.epsilon()))
+            yA,yB = vects
+            return tf.math.reduce_euclidean_norm(yA-yB,axis = 1,keepdims = True)
