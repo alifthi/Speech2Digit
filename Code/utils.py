@@ -1,5 +1,7 @@
 import glob
 import os
+
+from Code.main import AudioLabels
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras as ks
@@ -21,7 +23,7 @@ class utils():
             waveForm,_ = tf.audio.decode_wav(contents=audio)
             waveForm = tf.squeeze(waveForm, axis=-1)
             Audio.append(waveForm)
-            Labels.append(file.split("/")[-1].split("_")[0])
+            Labels.append(int(file.split("/")[-1].split("_")[0]))
             if i%400 == 0:
                 print(f'{i}th file is readed')
         return Audio,Labels
@@ -61,5 +63,9 @@ class utils():
         spectrogram = spectrogram[..., tf.newaxis]
         return spectrogram
     @staticmethod
-    def audImagePair():
+    def audImagePair(Spectogram,trainIm,audLabel,imLabel):
+        pairs  = []
+        for i in audLabel:
+            pass
+
         pass
